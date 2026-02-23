@@ -1,7 +1,7 @@
 # ============================================================
 # Apex-Bybit 流动性套利配置
 # A所 = Apex Pro（流动性来源 + 现货/合约价格参考）
-# B所 = Bybit（执行套利下单的壳子账户）
+# B所 = Bybit（执行套利下单）
 # ============================================================
 
 # ---------- Apex Pro 配置（A所）----------
@@ -13,7 +13,7 @@ apex:
   api_secret: ""     # 填入你的 Apex API Secret
   passphrase: ""     # 填入你的 Apex Passphrase
 
-# ---------- Bybit 配置（B所 / 壳子账户）----------
+# ---------- Bybit 配置（B所）----------
 bybit:
   base_url: "https://api.bybit.com"              # Bybit 主网 REST 地址
 #  base_url: "https://api-testnet.bybit.com"     # 测试网 REST 地址

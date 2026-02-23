@@ -11,7 +11,7 @@ type Config struct {
 	// Apex Pro（A所）配置
 	Apex ApexConfig `yaml:"apex"`
 
-	// Bybit（B所 / 壳子账户）配置
+	// Bybit（B所）配置
 	Bybit BybitConfig `yaml:"bybit"`
 
 	// Apex 交易对，例如 BTC-USDC
@@ -42,7 +42,7 @@ type ApexConfig struct {
 	Passphrase string `yaml:"passphrase"`
 }
 
-// BybitConfig Bybit REST/WS 接口配置（B所 / 壳子账户）
+// BybitConfig Bybit REST/WS 接口配置（B所）
 type BybitConfig struct {
 	BaseURL   string `yaml:"base_url"`
 	WsURL     string `yaml:"ws_url"`

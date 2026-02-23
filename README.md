@@ -2,6 +2,10 @@
 
 ## 套利原理
 
+> **壳子**：指没有散户、只有做市商画 K 线的 meme 币。这类币的价格完全由做市商控制，没有真实二级市场的价格发现机制。正是因为如此，在 A 所现货市场主动买入就能直接推高价格，并通过共享流动性池传导至 B 所永续合约。
+
+
+
 ### 模型一：被动价差套利（基础模型）
 
 ```
@@ -9,7 +13,7 @@ A所（Apex Pro）= 流动性来源，监控订单簿价格
         ↓
   共享流动性池（Apex + Bybit 共用深度）
         ↓
-  B所（Bybit）= 壳子账户，执行套利下单
+  B所（Bybit）= 执行套利下单
         ↓
   外部做市商 → 价差即为利润
 ```
@@ -21,7 +25,7 @@ A所（Apex Pro）= 流动性来源，监控订单簿价格
 | 场景1 | Apex 卖一价 < Bybit 买一价 | Apex 买入 + Bybit 卖出对冲 | `bybitBid - apexAsk - 手续费` |
 | 场景2 | Apex 买一价 > Bybit 卖一价 | Apex 卖出 + Bybit 买入对冲 | `apexBid - bybitAsk - 手续费` |
 
-两所共用流动性池，价差出现时立即通过壳子账户（Bybit）执行套利，吃掉外部做市商的差价。
+两所共用流动性池，价差出现时立即通过 Bybit 执行套利，吃掉外部做市商的差价。
 
 ---
 
@@ -82,7 +86,7 @@ Arbitrage/
 │   ├── client.go           # Apex Pro REST 客户端（A所）
 │   └── ws.go               # Apex Pro WebSocket 客户端（A所行情）
 ├── bybit/
-│   ├── client.go           # Bybit REST 客户端（B所壳子账户）
+│   ├── client.go           # Bybit REST 客户端（B所）
 │   └── ws.go               # Bybit WebSocket 客户端（B所行情）
 ├── strategy/
 │   └── engine.go           # 套利引擎核心逻辑
@@ -104,7 +108,7 @@ Arbitrage/
 | `apex.api_secret` | Apex API Secret | 从 Apex Pro 后台获取 |
 | `apex.passphrase` | Apex 口令 | 从 Apex Pro 后台获取 |
 
-### Bybit 配置（B所 / 壳子账户）
+### Bybit 配置（B所）
 
 | 字段 | 说明 | 示例 |
 |------|------|------|
@@ -254,13 +258,21 @@ Ctrl+C
 
 ## 代码变更记录
 
-### v1.0.0 — 2026-02-23
+### v1.3.0 — 2026-02-23
+
+**概念修正**
+
+- 修正项目中对「壳子」的错误理解：壳子是指没有散户、只有做市商画 K 线的 meme 币，而非账户/接口概念
+- 移除 `README.md`、`bybit/client.go`、`strategy/engine.go`、`config.yaml`、`config/config.go` 中所有「壳子账户」的错误描述
+- 在 README 套利原理章节首部补充壳子的正确定义
+
+
 
 **初始版本**
 
 - 新增 `apex/client.go`：Apex Pro REST 客户端，支持下单、撤单、查询持仓/账户
 - 新增 `apex/ws.go`：Apex Pro WebSocket 客户端，支持订单簿订阅、断线重连
-- 新增 `bybit/client.go`：Bybit V5 REST 客户端（壳子账户），支持下单、撤单、查询持仓/账户
+- 新增 `bybit/client.go`：Bybit V5 REST 客户端，支持下单、撤单、查询持仓/账户
 - 新增 `bybit/ws.go`：Bybit WebSocket 客户端，支持订单簿订阅、断线重连
 - 新增 `strategy/engine.go`：套利引擎核心，实现双所价差检测与双腿对冲下单
 - 新增 `risk/controller.go`：风控控制器，支持日亏损熔断、连续亏损熔断、余额检查

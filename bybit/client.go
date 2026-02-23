@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// Client Bybit REST 客户端（B所 / 壳子账户）
+// Client Bybit REST 客户端（B所）
 type Client struct {
 	baseURL    string
 	apiKey     string
@@ -67,7 +67,7 @@ type Account struct {
 type Order struct {
 	OrderID     string `json:"orderId"`
 	Symbol      string `json:"symbol"`
-	Side        string `json:"side"`   // Buy / Sell
+	Side        string `json:"side"`      // Buy / Sell
 	OrderType   string `json:"orderType"` // Limit / Market
 	Price       string `json:"price"`
 	Qty         string `json:"qty"`
@@ -78,10 +78,10 @@ type Order struct {
 
 // PlaceOrderReq 下单请求
 type PlaceOrderReq struct {
-	Category    string `json:"category"`              // linear（USDT永续）
+	Category    string `json:"category"` // linear（USDT永续）
 	Symbol      string `json:"symbol"`
-	Side        string `json:"side"`                  // Buy / Sell
-	OrderType   string `json:"orderType"`             // Limit / Market
+	Side        string `json:"side"`      // Buy / Sell
+	OrderType   string `json:"orderType"` // Limit / Market
 	Qty         string `json:"qty"`
 	Price       string `json:"price,omitempty"`
 	TimeInForce string `json:"timeInForce,omitempty"` // GTC / IOC / FOK / PostOnly
@@ -268,7 +268,7 @@ func (c *Client) GetPositions(symbol string) ([]Position, error) {
 	return result.Result.List, nil
 }
 
-// PlaceOrder 下单（B所壳子账户执行套利）
+// PlaceOrder 下单（B所执行套利）
 func (c *Client) PlaceOrder(req *PlaceOrderReq) (*Order, error) {
 	data, err := c.request("POST", "/v5/order/create", req)
 	if err != nil {

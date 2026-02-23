@@ -25,17 +25,18 @@ const (
 
 // ArbEngine 套利引擎
 // 逻辑：
-//   A所（Apex）= 流动性来源，监控其订单簿价格
-//   B所（Bybit）= 壳子账户，执行套利下单
-//   共用流动性池：Apex 和 Bybit 共享深度，价差出现时立即套利
-//   赚钱方式：当两所价差 > min_spread 时，低买高卖，吃掉外部做市商的差价
+//
+//	A所（Apex）= 流动性来源，监控其订单簿价格
+//	B所（Bybit）= 执行套利下单
+//	共用流动性池：Apex 和 Bybit 共享深度，价差出现时立即套利
+//	赚钱方式：当两所价差 > min_spread 时，低买高卖，吃掉外部做市商的差价
 type ArbEngine struct {
-	cfg        *config.Config
-	apexClient *apexPkg.Client
-	apexWs     *apexPkg.WsClient
+	cfg         *config.Config
+	apexClient  *apexPkg.Client
+	apexWs      *apexPkg.WsClient
 	bybitClient *bybitPkg.Client
-	bybitWs    *bybitPkg.WsClient
-	riskCtrl   *risk.Controller
+	bybitWs     *bybitPkg.WsClient
+	riskCtrl    *risk.Controller
 
 	// 最新行情（原子更新）
 	apexBid  atomic.Value // float64
@@ -43,7 +44,7 @@ type ArbEngine struct {
 	bybitBid atomic.Value // float64
 	bybitAsk atomic.Value // float64
 
-	// 当前持仓（Bybit 壳子账户）
+	// 当前持仓（Bybit B所）
 	posMu    sync.Mutex
 	position float64 // 正数=多头，负数=空头
 
@@ -282,7 +283,7 @@ func (e *ArbEngine) executeLong(apexAsk, bybitBid, spread float64) {
 	}
 	log.Printf("[套利] Apex 买入成功 OrderID=%s 价格=%s 数量=%s", apexOrder.ID, apexPrice, size)
 
-	// 腿2（对冲）：在 Bybit（B所壳子账户）卖出
+	// 腿2（对冲）：在 Bybit（B所）卖出
 	if e.cfg.Strategy.HedgeMode {
 		bybitOrder, err := e.bybitClient.PlaceOrder(&bybitPkg.PlaceOrderReq{
 			Category:    "linear",
@@ -338,7 +339,7 @@ func (e *ArbEngine) executeShort(apexBid, bybitAsk, spread float64) {
 	}
 	log.Printf("[套利] Apex 卖出成功 OrderID=%s 价格=%s 数量=%s", apexOrder.ID, apexPrice, size)
 
-	// 腿2（对冲）：在 Bybit（B所壳子账户）买入
+	// 腿2（对冲）：在 Bybit（B所）买入
 	if e.cfg.Strategy.HedgeMode {
 		bybitOrder, err := e.bybitClient.PlaceOrder(&bybitPkg.PlaceOrderReq{
 			Category:    "linear",
