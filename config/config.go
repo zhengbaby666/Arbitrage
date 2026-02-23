@@ -20,8 +20,14 @@ type Config struct {
 	// Bybit 交易对，例如 BTCUSDT
 	BybitSymbol string `yaml:"bybit_symbol"`
 
-	// 套利策略参数
+	// 运行模式：1=模型一（被动价差套利），2=模型二（联动推价套利）
+	Mode int `yaml:"mode"`
+
+	// 模型一套利策略参数
 	Strategy StrategyConfig `yaml:"strategy"`
+
+	// 模型二策略参数
+	Model2 Model2Config `yaml:"model2"`
 
 	// 风控参数
 	RiskControl RiskConfig `yaml:"risk_control"`
@@ -75,6 +81,45 @@ type StrategyConfig struct {
 
 	// 对冲滑点容忍（USDC）
 	HedgeSlippageUSDC float64 `yaml:"hedge_slippage_usdc"`
+}
+
+// Model2Config 模型二策略参数（跨交易所联动套利 + 做市商被动抬价）
+type Model2Config struct {
+	// Bybit 埋伏仓位大小（合约张数）
+	AmbushSize float64 `yaml:"ambush_size"`
+
+	// Apex 每轮推价买入量（合约张数）
+	PushOrderSize float64 `yaml:"push_order_size"`
+
+	// 推价总轮次（每轮间隔 push_interval_ms 毫秒）
+	PushRounds int `yaml:"push_rounds"`
+
+	// 推价间隔（毫秒）
+	PushIntervalMs int `yaml:"push_interval_ms"`
+
+	// 推价滑点（相对于卖一价的比例，例如 0.001 = 0.1%）
+	PushPriceSlippage float64 `yaml:"push_price_slippage"`
+
+	// 每张合约的止盈目标（USDC），Bybit 永续价格涨幅达到此值时平仓
+	TakeProfitPerUnit float64 `yaml:"take_profit_per_unit"`
+
+	// 每张合约的止损（USDC），浮亏超过此值时强制平仓
+	StopLossPerUnit float64 `yaml:"stop_loss_per_unit"`
+
+	// 总盈利目标（USDC），达到后停止策略
+	TotalTakeProfitUSDC float64 `yaml:"total_take_profit_usdc"`
+
+	// 总止损（USDC），超过后停止策略
+	TotalStopLossUSDC float64 `yaml:"total_stop_loss_usdc"`
+
+	// 等待价格传导的超时时间（秒），超时后强制平仓
+	TransmissionTimeoutSec int `yaml:"transmission_timeout_sec"`
+
+	// 每轮结束后的冷却时间（秒）
+	CooldownSec int `yaml:"cooldown_sec"`
+
+	// 策略检查间隔（毫秒）
+	CheckIntervalMs int `yaml:"check_interval_ms"`
 }
 
 // RiskConfig 风控配置

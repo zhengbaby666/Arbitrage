@@ -27,6 +27,11 @@ bybit:
 apex_symbol: "BTC-USDC"
 bybit_symbol: "BTCUSDT"
 
+# ---------- 运行模式 ----------
+# 1 = 模型一：被动价差套利（等待两所自然价差）
+# 2 = 模型二：跨交易所联动套利 + 做市商被动抬价（主动推价）
+mode: 1
+
 # ---------- 套利策略参数 ----------
 strategy:
   # 触发套利的最小价差（USDC）
@@ -70,3 +75,47 @@ risk_control:
 
   # 账户最低可用余额（USDC），低于此值停止交易
   min_balance_usdc: 200.0
+
+# ---------- 模型二参数（mode: 2 时生效）----------
+model2:
+  # Bybit 永续合约埋伏仓位大小（合约张数）
+  # 推价前提前做多，仓位越大利润越高，但风险也越大
+  ambush_size: 0.01
+
+  # Apex 每轮推价买入量（合约张数）
+  # 每轮买入此数量，推高 Apex 现货价格
+  push_order_size: 0.005
+
+  # 推价总轮次（每轮间隔 push_interval_ms 毫秒）
+  # 总推价量 = push_order_size × push_rounds
+  push_rounds: 5
+
+  # 推价间隔（毫秒）
+  push_interval_ms: 500
+
+  # 推价滑点（相对于卖一价的比例，0.001 = 0.1%）
+  # 买入价 = 卖一价 × (1 + push_price_slippage)，确保成交并推动价格
+  push_price_slippage: 0.001
+
+  # 每张合约的止盈目标（USDC）
+  # Bybit 永续价格每张涨幅达到此值时平仓
+  take_profit_per_unit: 5.0
+
+  # 每张合约的止损（USDC）
+  # 浮亏超过此值时强制平仓
+  stop_loss_per_unit: 3.0
+
+  # 总盈利目标（USDC），达到后停止策略
+  total_take_profit_usdc: 200.0
+
+  # 总止损（USDC），超过后停止策略
+  total_stop_loss_usdc: 80.0
+
+  # 等待价格传导超时（秒），超时后强制平仓
+  transmission_timeout_sec: 60
+
+  # 每轮结束后的冷却时间（秒），等待市场恢复
+  cooldown_sec: 30
+
+  # 策略检查间隔（毫秒）
+  check_interval_ms: 300
