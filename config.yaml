@@ -1,0 +1,72 @@
+# ============================================================
+# Apex-Bybit 流动性套利配置
+# A所 = Apex Pro（流动性来源 + 现货/合约价格参考）
+# B所 = Bybit（执行套利下单的壳子账户）
+# ============================================================
+
+# ---------- Apex Pro 配置（A所）----------
+apex:
+  base_url: "https://pro.apex.exchange"          # Apex Pro 主网 REST 地址
+#  base_url: "https://testnet.pro.apex.exchange"  # 测试网 REST 地址
+  ws_url: "wss://pro.apex.exchange/realtime"      # WebSocket 地址
+  api_key: ""        # 填入你的 Apex API Key
+  api_secret: ""     # 填入你的 Apex API Secret
+  passphrase: ""     # 填入你的 Apex Passphrase
+
+# ---------- Bybit 配置（B所 / 壳子账户）----------
+bybit:
+  base_url: "https://api.bybit.com"              # Bybit 主网 REST 地址
+#  base_url: "https://api-testnet.bybit.com"     # 测试网 REST 地址
+  ws_url: "wss://stream.bybit.com/v5/public/linear"  # Bybit 公共 WS（行情）
+  api_key: ""        # 填入你的 Bybit API Key
+  api_secret: ""     # 填入你的 Bybit API Secret
+
+# ---------- 交易对配置 ----------
+# Apex 格式：BTC-USDC
+# Bybit 格式：BTCUSDT（永续合约）
+apex_symbol: "BTC-USDC"
+bybit_symbol: "BTCUSDT"
+
+# ---------- 套利策略参数 ----------
+strategy:
+  # 触发套利的最小价差（USDC）
+  # Apex 买一价 与 Bybit 买一价 之差超过此值才开仓
+  min_spread_usdc: 1.0
+
+  # 单笔下单量（合约张数）
+  order_size: 0.001
+
+  # 最大净持仓量（合约张数，超过后停止同向开仓）
+  max_position: 0.01
+
+  # 套利方向检查间隔（毫秒）
+  check_interval_ms: 200
+
+  # 盈利目标（USDC，达到后程序自动退出）
+  take_profit_usdc: 100.0
+
+  # 止损（USDC，超过后程序自动退出）
+  stop_loss_usdc: 30.0
+
+  # 价格精度（小数位数）
+  price_precision: 1
+
+  # 数量精度（小数位数）
+  size_precision: 3
+
+  # 对冲模式：true=开仓同时在对面所对冲，false=单腿开仓
+  hedge_mode: true
+
+  # 对冲滑点容忍（USDC）：对冲腿允许的最大滑点
+  hedge_slippage_usdc: 0.5
+
+# ---------- 风控参数 ----------
+risk_control:
+  # 单日最大亏损（USDC），超过后熔断停止
+  max_daily_loss_usdc: 50.0
+
+  # 最大连续亏损次数，超过后需人工重置
+  max_consecutive_loss: 5
+
+  # 账户最低可用余额（USDC），低于此值停止交易
+  min_balance_usdc: 200.0
